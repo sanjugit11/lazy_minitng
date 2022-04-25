@@ -5,12 +5,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "contracts/ERC1155/1155.sol";
 import "contracts/I1155.sol";
-//import "contracts/ERC1155/ERC1155.sol";
+import "contracts/ERC1155/IERC1155.sol";
 import "hardhat/console.sol";
-// import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 contract LazzyMinting is AccessControl,EIP712("LazyNFT-Voucher", "1"){
 
@@ -21,10 +19,12 @@ contract LazzyMinting is AccessControl,EIP712("LazyNFT-Voucher", "1"){
     //uint public OwnerRoyalty;
     address public Creator;
 
-    IERC1155 public NFT;
+    I1155 public NFT;
 
 
-    mapping(uint => uint) public OwnerCount;
+    mapping(uint => uint) public OwnerCount;   // function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl,ERC1155) returns (bool){
+    //    super.supportsInterface(interfaceId);
+    // }
     mapping(uint => mapping(uint => address)) public OwnerAddress;
 
     event transfer ( address from, address to ,uint tokenId,  uint tokenamount, uint amount );
@@ -33,8 +33,9 @@ contract LazzyMinting is AccessControl,EIP712("LazyNFT-Voucher", "1"){
     string private constant SIGNING_DOMAIN = "LazyNFT-Voucher";
     string private constant SIGNATURE_VERSION = "1";
 
-    constructor(address payable minter, address _NFT){
-        NFT = IERC1155(_NFT);
+    constructor (address payable minter, address _NFT)
+    {
+        NFT = I1155(_NFT);
         _setupRole(MINTER_ROLE, minter);
         _setupRole(DEFAULT_ADMIN_ROLE, minter);
     }
@@ -85,11 +86,11 @@ contract LazzyMinting is AccessControl,EIP712("LazyNFT-Voucher", "1"){
         return voucher.tokenId;
     }
                                                                                                                                                                             
-    function buy(address sender,uint256 tokenId,uint160 amount) payable external {
+    function buy(address sender,uint256 tokenId,uint160 amount,bytes memory data) payable external {
        require(msg.value == price, "not equal");
        console.log(sender, address(this));
        //console.log("approve", isApprovedForAll(sender, address(this)), balanceOf(sender,tokenId));
-       NFT.safeTransferFrom(sender,msg.sender,tokenId,amount);
+       NFT.safeTransferFrom(sender,msg.sender,tokenId,amount,data);
         Royalty = msg.value * 5/100;
         value = Royalty / OwnerCount[tokenId];
        for(uint i = 0; i < OwnerCount[tokenId]; i++){
@@ -102,9 +103,9 @@ contract LazzyMinting is AccessControl,EIP712("LazyNFT-Voucher", "1"){
     emit transfer(sender,msg.sender,tokenId,amount,msg.value );
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl,ERC1155) returns (bool){
-       super.supportsInterface(interfaceId);
-    }
+    // function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl,ERC1155) returns (bool){
+    //    super.supportsInterface(interfaceId);
+    // }
 
     function getChainID() external view returns (uint256) {
         uint256 id;

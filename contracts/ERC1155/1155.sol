@@ -12,8 +12,7 @@ contract NFT1155 is ERC1155, AccessControl {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
    
 
-    constructor(address token) ERC1155() {
-        Token = IERC1155(token);
+    constructor() ERC1155() {
        _setupRole(MINTER_ROLE, msg.sender);
        _setupRole(MINTER_ROLE,address(this));
        _setupRole(BURNER_ROLE,msg.sender);

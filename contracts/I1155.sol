@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
+
 interface I1155 {
 
 function mint(
@@ -14,14 +15,14 @@ function mint(
         uint256 amount
     ) external;
  
-    function setURI(uint256 tokenId, string memory newuri) external; 
-
-    function safeTransferFrom(
+     function safeTransferFrom(
         address from,
         address to,
-        uint256 tokenId,
-        uint256 amount
-    ) external ;
-
+        uint256 id,
+        uint256 amount,
+        bytes calldata data
+    ) external;
+    
+    function setURI(uint256 tokenId, string memory newuri) external; 
   
 }
