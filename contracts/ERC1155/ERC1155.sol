@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "./IERC1155.sol";
 import "./IERC1155Receiver.sol";
 import "./extensions/IERC1155MetadataURI.sol";
+import "hardhat/console.sol";
 
 /**
  *
@@ -162,6 +163,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         bytes memory data
     ) public virtual override {
         require(to != address(0), "ERC1155: transfer to the zero address");
+        console.log("enter",from , _msgSender());
         require(
             from == _msgSender() || isApprovedForAll(from, _msgSender()),
             "ERC1155: caller is not owner nor approved"

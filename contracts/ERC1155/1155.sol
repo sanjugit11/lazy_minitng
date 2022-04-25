@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "contracts/ERC1155/ERC1155.sol";
+import "./IERC1155.sol";
+
 
 contract NFT1155 is ERC1155, AccessControl {
 
@@ -10,7 +12,7 @@ contract NFT1155 is ERC1155, AccessControl {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
    
 
-    constructor(address token) ERC1155("abcd") {
+    constructor(address token) ERC1155() {
         Token = IERC1155(token);
        _setupRole(MINTER_ROLE, msg.sender);
        _setupRole(MINTER_ROLE,address(this));
@@ -30,18 +32,23 @@ contract NFT1155 is ERC1155, AccessControl {
    
     function mint(
         address to,
-        uint256 Id,
+        uint256 tokenId,
         uint256 amount
     ) external onlyRole(MINTER_ROLE) {
-        _mint(to, Id, amount, "");
+        _mint(to, tokenId, amount, "");
     }
 
     function burn(
         address from,
-        uint256 Id,
+        uint256 tokenId,
         uint256 amount
     ) external onlyRole(MINTER_ROLE) {
-        _burn(from, Id, amount);
+        _burn(from, tokenId, amount);
     }
 
+    function setURI(uint256 tokenId, string memory newuri) external onlyRole(MINTER_ROLE) {
+        _setURI(tokenId,newuri);
+    }
+
+    
 }

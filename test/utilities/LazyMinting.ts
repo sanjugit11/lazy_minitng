@@ -1,9 +1,10 @@
 import { BigNumberish, BytesLike, ethers, Wallet } from "ethers"
 import { formatBytes32String } from "ethers/lib/utils";
 import { encode } from "querystring";
+import { any } from "underscore";
 
-const SIGNING_DOMAIN_NAME = "LazyNFT-Voucher" 
-const SIGNING_DOMAIN_VERSION = "1"
+const SIGNING_DOMAIN_NAME = "LazyNFT-Voucher"  // encode krne ke liye salt lgti hai  ex:-  adding formula  values alg dono ki 2 persons
+const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
 
 /**
  * LazyMinter is a helper class that creates NFTVoucher objects and signs them, to be redeemed later by the LazyNFT contract.
@@ -14,7 +15,7 @@ const SIGNING_DOMAIN_VERSION = "1"
   public signer : any; 
   public _domain : any;
 
-  constructor(data:any ) { 
+  constructor(data:any) { 
     const {_contract, _signer} =data; 
     this.contract = _contract 
     this.signer = _signer
@@ -29,11 +30,31 @@ const SIGNING_DOMAIN_VERSION = "1"
         {name: "Address", type: "uint160"},
         {name: "Amount", type: "uint160"},
         {name: "uri", type: "string"}, 
+
       ]
     }
     const signature = await this.signer._signTypedData(domain, types, voucher)
+    // console.log("signature",signature);
+    // console.log(voucher,"voucher");
     return {
       ...voucher,
+      signature,
+    }
+  }
+  
+  async sellVoucher(tokenId: any, Owner: any, Amount: any, signer:any ) {
+    const Voucher = { tokenId, Owner,Amount}
+    const domain = await this._signingDomain()
+    const types = {
+      SELLVoucher: [
+        {name: "tokenId", type: "uint256"},
+        {name: "Owner", type: "uint160"},
+        {name: "Amount", type: "uint256"},
+      ]
+    }
+    const signature = await signer._signTypedData(domain, types, Voucher)
+    return{
+      ...Voucher,
       signature,
     }
   }
