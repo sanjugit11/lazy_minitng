@@ -28,7 +28,7 @@ const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
       NFTVoucher: [
         {name: "tokenId", type: "uint256"},
         {name: "Address", type: "uint160"},
-        {name: "Amount", type: "uint160"},
+        {name: "Amount", type: "uint256"},
         {name: "uri", type: "string"}, 
 
       ]
@@ -42,17 +42,21 @@ const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
     }
   }
   
-  async sellVoucher(tokenId: any, Owner: any, Amount: any, signer:any ) {
-    const Voucher = { tokenId, Owner,Amount}
+  async sellVoucher(tokenId: any, Address: any, Amount: any, signer:any,uri: any ) {
+    console.log("address",signer.address);
+    const Voucher = { tokenId, Address,Amount, uri}
     const domain = await this._signingDomain()
     const types = {
       SELLVoucher: [
         {name: "tokenId", type: "uint256"},
-        {name: "Owner", type: "uint160"},
+        {name: "Address", type: "uint160"},
         {name: "Amount", type: "uint256"},
+        {name: "uri", type: "string"}, 
       ]
     }
+    // console.log("sign",signer);
     const signature = await signer._signTypedData(domain, types, Voucher)
+    console.log("sign",signature);
     return{
       ...Voucher,
       signature,

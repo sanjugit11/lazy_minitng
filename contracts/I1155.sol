@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-interface I1155 {
+import "contracts/ERC1155/IERC1155.sol";
+interface I1155 is IERC1155{
 
 function mint(
         address to,
@@ -22,6 +23,5 @@ function mint(
         uint256 tokenId,
         uint256 amount
     ) external ;
-
   
 }
