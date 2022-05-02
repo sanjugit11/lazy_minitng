@@ -134,6 +134,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
             _msgSender() != operator,
             "ERC1155: setting approval status for self"
         );
+        console.log(_msgSender(), operator,"setApprovalForAll");
 
         _operatorApprovals[_msgSender()][operator] = approved;
         emit ApprovalForAll(_msgSender(), operator, approved);
@@ -163,9 +164,10 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         bytes memory data
     ) public virtual override {
         require(to != address(0), "ERC1155: transfer to the zero address");
-        console.log("enter",from , _msgSender());
+        // console.log("enter",from , _msgSender());
         require(
-            from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            // from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            isApprovedForAll(from, to),
             "ERC1155: caller is not owner nor approved"
         );
 

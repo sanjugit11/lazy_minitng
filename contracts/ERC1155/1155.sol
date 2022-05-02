@@ -3,16 +3,17 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "contracts/ERC1155/ERC1155.sol";
 import "./IERC1155.sol";
+import "hardhat/console.sol";
 
 
 contract NFT1155 is ERC1155, AccessControl {
 
-    IERC1155 public Token;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
    
 
     constructor() ERC1155() {
+        //console.log("contract", msg.sender);
        _setupRole(MINTER_ROLE, msg.sender);
        _setupRole(MINTER_ROLE,address(this));
        _setupRole(BURNER_ROLE,msg.sender);
@@ -28,6 +29,9 @@ contract NFT1155 is ERC1155, AccessControl {
         return super.supportsInterface(interfaceId);
     }
 
+    function setMinter( address  _Minter) external{
+         _setupRole(MINTER_ROLE,_Minter);
+    }
    
     function mint(
         address to,
