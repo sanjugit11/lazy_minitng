@@ -46,6 +46,7 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
         uint160 Address;
         uint160 Amount;
         string uri;
+        uint Price;
         bytes signature;
     }
 
@@ -72,11 +73,12 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "NFTVoucher(uint256 tokenId,uint160 Address,uint256 Amount,string uri)"
+                            "NFTVoucher(uint256 tokenId,uint160 Address,uint256 Amount,uint256 Price,string uri)"
                         ),
                         voucher.tokenId,
                         voucher.Address,
                         voucher.Amount,
+                        voucher.Price,
                         keccak256(bytes(voucher.uri))
                     )
                 )
@@ -156,7 +158,7 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
     //     // console.log(ECDSA.recover(digest,voucher.signature),"this is verify voucher");
     // }
     ////////////basic funtion///////////
-    function redeem(NFTVoucher calldata voucher) public returns (uint256) {
+    function redeem(NFTVoucher calldata voucher) public payable returns (uint256) {
         address signer = _verify(voucher);
         require(
             voucher.Address == conversion(msg.sender),
@@ -167,6 +169,7 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
             hasRole(MINTER_ROLE, signer),
             "Signature invalid or unauthorized"
         );
+        require(voucher.Price == msg.value,"price unmatched");
         OwnerCount[voucher.tokenId]++;
         OwnerAddress[voucher.tokenId][OwnerCount[voucher.tokenId]] = address(
             voucher.Address

@@ -6,12 +6,12 @@ import{
 }
 from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ethers } from "hardhat";
+import { ethers ,waffle} from "hardhat";
 import { mineBlocks, expandTo18Decimals } from "./utilities/utilities";
 import { expect } from "chai";
 import LazyMinting from "./utilities/LazyMinting";
 // import LazyMinting2 from "./utilities/Lazyminiting2";
-
+const provider = waffle.provider;
 
 describe("LazyMinting", async() => {
     let Contract: LazzyMinting;
@@ -34,22 +34,53 @@ describe("LazyMinting", async() => {
        // console.log("owner", await nft.hasRole(await nft.MINTER_ROLE(),Contract.address));
     });
 
-    it("redeem : success", async() => {
+    it.only("redeem : success", async() => {
         const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
+
         console.log(signers[1].address);
-        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,"komal");
-        // console.log(voucher,"voucher");
-        await Contract.connect(signers[2]).redeem(voucher);
+        const balanceInWei = await provider.getBalance(signers[1].address);
+        console.log(ethers.utils.formatEther(balanceInWei) ,"signers[1].address balance");
+
+        const balanceInWei2 = await provider.getBalance(signers[2].address);
+        console.log(ethers.utils.formatEther(balanceInWei2) ,"signers[2].address balance");
+
+        const balanceInWei2contract= await provider.getBalance(Contract.address);
+        console.log(ethers.utils.formatEther(balanceInWei2contract) ,"Contract.address balance");
+        
+        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,expandTo18Decimals(1),"komal");
+        console.log("voucher");
+        const call= await Contract.connect(signers[2]).redeem(voucher,{value:expandTo18Decimals(1)});
+     
+        const balanceInWeiafter = await provider.getBalance(signers[1].address);
+        console.log(ethers.utils.formatEther(balanceInWeiafter) ,"signers[1].address balance After");
+
+        const balanceInWei2after = await provider.getBalance(signers[2].address);
+        console.log(ethers.utils.formatEther(balanceInWei2after) ,"signers[2].address balance After");
+        // console.log(call);
+
+        const balanceInWei2contractafter= await provider.getBalance(Contract.address);
+        console.log(ethers.utils.formatEther(balanceInWei2contractafter) ,"Contract.address balance  After");
         const AmountNFT = await nft.balanceOf(signers[2].address ,1);
         console.log(Number(AmountNFT), "AMOuntNFT");
    
         expect(Number(AmountNFT)).to.be.eq(Number(100));
     });
+    // it("redeem : success", async() => {
+    //     const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
+    //     console.log(signers[1].address);
+    //     const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,"komal");
+    //     // console.log(voucher,"voucher");
+    //     await Contract.connect(signers[2]).redeem(voucher);
+    //     const AmountNFT = await nft.balanceOf(signers[2].address ,1);
+    //     console.log(Number(AmountNFT), "AMOuntNFT");
+   
+    //     expect(Number(AmountNFT)).to.be.eq(Number(100));
+    // });
 
     it("redeem : Reverted", async() => {
         const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
         //console.log(signers[1]);
-        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[1].address),100,"komal");
+        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[1].address),100,expandTo18Decimals(1),"komal");
         // await Contract.connect(signers[2]).redeem(voucher);
         const AmountNFT = await nft.balanceOf(signers[2].address ,1);
         console.log(Number(AmountNFT), "AMOuntNFT");
@@ -57,10 +88,10 @@ describe("LazyMinting", async() => {
         await expect(Contract.connect(signers[2]).redeem(voucher)).to.be.revertedWith("unauthorized Access");
     });
                                                                                                                                                                                                                                                                                                                                                                                                             
-    it.only("buy" , async () => {
+    it("buy" , async () => {
         console.log(signers[1].address,"address 1");
         const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
-        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,"komal");
+        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,expandTo18Decimals(1),"komal");
         await Contract.connect(signers[2]).redeem(voucher);
         const AmountNFT = await nft.balanceOf(signers[2].address ,1);
         console.log(Number(AmountNFT), "AMOuntNFT in buy case");

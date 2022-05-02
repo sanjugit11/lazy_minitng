@@ -18,14 +18,15 @@ const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
     this.signer = _signer
   }
 
-  async createVoucher(tokenId: any, Address: any,Amount: any,uri: any) {
-    const voucher = { tokenId, Address,Amount ,uri}
+  async createVoucher(tokenId: any, Address: any,Amount: any,Price: any,uri: any) {
+    const voucher = { tokenId, Address,Amount ,Price,uri}
     const domain = await this._signingDomain()
     const types = {
       NFTVoucher: [
         {name: "tokenId", type: "uint256"},
         {name: "Address", type: "uint160"},
         {name: "Amount", type: "uint256"},
+        {name: "Price", type:"uint256"},
         {name: "uri", type: "string"}, 
 
       ]
