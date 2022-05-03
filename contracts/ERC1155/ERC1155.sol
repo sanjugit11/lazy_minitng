@@ -166,8 +166,8 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         require(to != address(0), "ERC1155: transfer to the zero address");
         // console.log("enter",from , _msgSender());
         require(
-            // from == _msgSender() || isApprovedForAll(from, _msgSender()),
-            isApprovedForAll(from, to),
+            from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            // isApprovedForAll(from, to),
             "ERC1155: caller is not owner nor approved"
         );
 

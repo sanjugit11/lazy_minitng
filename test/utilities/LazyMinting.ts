@@ -40,10 +40,10 @@ const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
     }
   }
   
-  async sellVoucher(tokenId: any, signer: any, Address:any,Amount: any,uri: any ) {
+  async sellVoucher(tokenId: any, signer: any, Address:any,Amount: any,Price:any,uri: any ) {
     console.log(this.signer.address,"address from sell voucher");
     let voucherCount = this.voucherCount;
-    const Voucher = { tokenId, Address,Amount, uri,voucherCount};
+    const Voucher = { tokenId, Address,Amount, Price,uri,voucherCount};
     const domain = await this._signingDomain();
     // console.log(domain ,"domain");
     const types = {
@@ -51,8 +51,9 @@ const SIGNING_DOMAIN_VERSION = "1"  //  dono ko mila kr salt
         {name: "tokenId", type: "uint256"},
         {name: "Address", type: "uint160"},
         {name: "Amount", type: "uint256"},
+        {name: "Price" , type:"uint256"},
+        {name:"voucherCount",type:"uint256"} ,
         {name: "uri", type: "string"},
-        {name:"voucherCount",type:"uint256"} 
       ]
     }
     this.voucherCount++;

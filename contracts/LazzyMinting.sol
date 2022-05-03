@@ -55,6 +55,7 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
         uint160 Address;
         uint160 Amount;
         string uri;
+        uint256 Price;
         uint256 voucherCount;
         bytes signature;
     }
@@ -184,19 +185,15 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
         address sender,
         uint256 tokenId,
         uint160 amount,
-        SELLVoucher calldata voucher2
+        SELLVoucher calldata voucher
     ) external payable {
-        require(!VOUCHERcount[voucher2.voucherCount], "already used voucher");
-        address signer = _verify2(voucher2);
-        // uint160 v2addr =  conversion(voucher2.)
-        // console.log(v2addr, "this signer is from buy");
-        console.log(
-            NFT.balanceOf(sender, tokenId),
-            "this is signer NFT balance"
-        );
+        require(!VOUCHERcount[voucher.voucherCount], "already used voucher");
+        address signer = _verify2(voucher);
+        console.log(signer, "this signer is from buy");
+        console.log( NFT.balanceOf(sender, tokenId),"this is signer NFT balance" );
 
         require(NFT.balanceOf(sender, tokenId) > 0, " balance is not there");
-        require(msg.value == price, "not equal");
+        require(voucher.Price ==msg.value, "price mismatch");
 
         NFT.safeTransferFrom(sender, msg.sender, tokenId, amount, "");
         Royalty = (msg.value * OwnerRoyalty) / 100;
@@ -211,7 +208,7 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
             value: (msg.value * (100 - OwnerRoyalty)) / 100
         }("");
         require(sent, "Failed to send  to seller");
-        VOUCHERcount[voucher2.voucherCount] = true;
+        VOUCHERcount[voucher.voucherCount] = true;
             console.log(
             NFT.balanceOf(sender, tokenId),
             "this is signer NFT balance"

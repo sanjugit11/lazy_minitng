@@ -26,15 +26,16 @@ describe("LazyMinting", async() => {
         Contract = await new LazzyMinting__factory(owner).deploy(signers[1].address,nft.address);
         console.log(owner.address,"owner Address");
         console.log(nft.address,"nft deployed Address");
-        console.log(Contract.address,"owner deployed Address");
-
+        console.log(Contract.address,"Contract deployed Address");
+        console.log(signers[2].address,"this is the second addr for buy");
+        console.log(signers[3].address,"this is the 3 addr for buy")
         // let role = await nft.connect(owner).MINTER_ROLE();
         // console.log(role);
         await nft.connect(owner).setMinter(Contract.address);
        // console.log("owner", await nft.hasRole(await nft.MINTER_ROLE(),Contract.address));
     });
 
-    it.only("redeem : success", async() => {
+    it("redeem : success", async() => {
         const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
 
         console.log(signers[1].address);
@@ -88,29 +89,27 @@ describe("LazyMinting", async() => {
         await expect(Contract.connect(signers[2]).redeem(voucher)).to.be.revertedWith("unauthorized Access");
     });
                                                                                                                                                                                                                                                                                                                                                                                                             
-    it("buy" , async () => {
+    it.only("buy" , async () => {
         console.log(signers[1].address,"address 1");
         const lazyMinting = new LazyMinting({_contract:Contract, _signer:signers[1]});
-        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[2].address),100,expandTo18Decimals(1),"komal");
-        await Contract.connect(signers[2]).redeem(voucher);
-        const AmountNFT = await nft.balanceOf(signers[2].address ,1);
-        console.log(Number(AmountNFT), "AMOuntNFT in buy case");
-        await Contract.connect(signers[1]).setprice(expandTo18Decimals(1));
-
-        const lazyMinting1 = new LazyMinting({_contract:Contract, _signer:signers[2]});
-
-        const Voucher = await lazyMinting1.sellVoucher(1,signers[2],await Contract.conversion(signers[2].address),1,"komal");
-
+        const voucher = await lazyMinting.createVoucher(1,await Contract.conversion(signers[1].address),100,expandTo18Decimals(1),"komal");
+        await Contract.connect(signers[1]).redeem(voucher,{value:expandTo18Decimals(1)});
+        const AmountNFT = await nft.balanceOf(signers[1].address ,1);
+        console.log(Number(AmountNFT), "AMOuntNFT in buy  from address 1");
+        //price set//
+        // await Contract.connect(signers[1]).setprice(expandTo18Decimals(2));
+        //signature from the minter or second address
+        // const lazyMinting1 = new LazyMinting({_contract:Contract, _signer:signers[1]});
+        const Voucher = await lazyMinting.sellVoucher(1,signers[1],await Contract.conversion(signers[1].address),7,expandTo18Decimals(2),"komal");
         // console.log(Voucher,"this is the sell siganture voucher test");
-        console.log(signers[2].address,"this is the second addr for buy");
-        console.log(signers[3].address,"this is the 3 addr for buy")
 
-        // await nft.connect(signers[2]).setApprovalForAll(Contract.address,true);
-        await nft.connect(signers[2]).setApprovalForAll(signers[3].address,true);
-
-        await Contract.connect(signers[3]).buy(signers[2].address,1, 7,Voucher,{value: expandTo18Decimals(1)});
+        //approval//
+        await nft.connect(signers[1]).setApprovalForAll(Contract.address,true);
+        // await nft.connect(signers[1]).setApprovalForAll(signers[2].address,true);
+        //buy//
+        await Contract.connect(signers[2]).buy(signers[1].address,1, 7,Voucher,{value: expandTo18Decimals(2)});
         
-        const AmountNFT1 = await nft.balanceOf(signers[3].address ,1);
+        const AmountNFT1 = await nft.balanceOf(signers[2].address ,1);
         console.log(Number(AmountNFT1), "AMOuntNFT1");
         // await Contract.connect(signers[1]).setApprovalForAll(signers[1].address,true);
         // await Contract.connect((signers[1])).buy(signers[2].address, 1, 100);
