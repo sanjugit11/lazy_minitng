@@ -197,7 +197,11 @@ contract LazzyMinting is AccessControl, EIP712("LazyNFT-Voucher", "1") {
 
         NFT.safeTransferFrom(sender, msg.sender, tokenId, amount, "");
         Royalty = (msg.value * OwnerRoyalty) / 100;
+        console.log(msg.value , "amount MSG.VALUE");
+        console.log(Royalty ,"ROYALITY AMOUNT");
         value = Royalty / OwnerCount[tokenId];
+        console.log(OwnerCount[tokenId],"_OwnerCount[tokenId]");
+        console.log(value ,"per owner will get this value");
         for (uint256 i = 0; i < OwnerCount[tokenId]; i++) {
             (bool sent, bytes memory data) = payable(
                 (OwnerAddress[tokenId][i + 1])
